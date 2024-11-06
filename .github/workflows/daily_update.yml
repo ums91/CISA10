@@ -2,25 +2,26 @@ name: Update CISA Vulnerabilities README
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-  workflow_dispatch:  # Enables the manual "Run" button
+    - cron: '0 0 * * *'  # Run every day at midnight (adjust as needed)
 
 jobs:
-  update_readme:
+  update-readme:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests PyGithub
+        run: |
+          pip install requests PyGithub
 
-      - name: Run update script
+      - name: Run script to update README
         env:
-          GITHUB_TOKEN: ${{ secrets.CISA_10 }}
-        run: python update_cisa_vulnerabilities_readme.py
+          CISA_10: ${{ secrets.CISA_10 }}  # Use the GitHub secret for the token
+        run: |
+          python update_cisa_vulnerabilities_readme.py
