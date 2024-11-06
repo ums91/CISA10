@@ -52,10 +52,12 @@ def format_vulnerabilities_for_readme(vulnerabilities):
 
 def update_github_readme(content):
     try:
+        print("Initializing GitHub client...")
         # Initialize the GitHub API client
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(REPO_NAME)
-
+        print(f"Connected to repository: {repo.name}")
+        
         # Try to fetch the README file to update it
         try:
             print("Attempting to fetch README.md from the repo...")
