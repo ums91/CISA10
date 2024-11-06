@@ -20,10 +20,15 @@ def fetch_cisa_vulnerabilities():
         response = requests.get(CISA_VULNERABILITIES_URL)
         response.raise_for_status()  # Raises an HTTPError if the response was an error
         vulnerabilities = response.json()  # Parse the JSON response
+
+        # Debugging: print the structure of the vulnerabilities object
+        print(json.dumps(vulnerabilities, indent=2))  # Pretty print the JSON response for inspection
+
         return vulnerabilities
     except requests.exceptions.RequestException as e:
         print(f"Error fetching CISA vulnerabilities: {e}")
         raise
+
 
 # Update the README with the latest vulnerabilities
 def update_github_readme(content):
