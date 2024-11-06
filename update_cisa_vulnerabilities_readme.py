@@ -60,17 +60,18 @@ def format_vulnerabilities_for_readme(vulnerabilities):
         # Debug: Print formatted content for each vulnerability
         print(f"Formatting CVE: {cve_id}, Description: {short_description}, Date: {date_added}, Severity: {severity}")
         
-        readme_content += f"### {cve_id}\n"
-        readme_content += f"**Vendor Project**: {vendor_project}\n"
-        readme_content += f"**Product**: {product}\n"
-        readme_content += f"**Vulnerability Name**: {vulnerability_name}\n"
-        readme_content += f"**Published Date**: {date_added}\n"
-        readme_content += f"**Description**: {short_description}\n"
-        readme_content += f"**Required Action**: {required_action}\n"
-        readme_content += f"**Due Date**: {due_date}\n"
-        readme_content += f"**Severity**: {severity}\n"
-        readme_content += f"**Known Ransomware Campaign Use**: {ransomware_use}\n"
-        readme_content += f"**Notes**: {notes}\n\n"
+        # Adding each field in its own paragraph
+        readme_content += f"### {cve_id}\n\n"
+        readme_content += f"**Vendor Project**:\n{vendor_project}\n\n"
+        readme_content += f"**Product**:\n{product}\n\n"
+        readme_content += f"**Vulnerability Name**:\n{vulnerability_name}\n\n"
+        readme_content += f"**Published Date**:\n{date_added}\n\n"
+        readme_content += f"**Description**:\n{short_description}\n\n"
+        readme_content += f"**Required Action**:\n{required_action}\n\n"
+        readme_content += f"**Due Date**:\n{due_date}\n\n"
+        readme_content += f"**Severity**:\n{severity}\n\n"
+        readme_content += f"**Known Ransomware Campaign Use**:\n{ransomware_use}\n\n"
+        readme_content += f"**Notes**:\n{notes}\n\n"
 
     return readme_content
 
