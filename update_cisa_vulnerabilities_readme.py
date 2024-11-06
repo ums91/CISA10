@@ -10,7 +10,7 @@ DATE_THRESHOLD = datetime(2024, 11, 1)  # The date from which to fetch vulnerabi
 
 # Fetch the GitHub token from GitHub Secrets
 GITHUB_TOKEN = os.getenv("CISA_10")
-REPO_NAME = "your_github_username/CISA10"  # Replace with your GitHub repo name
+REPO_NAME = "ums91/CISA10"  # Make sure this is correct: username/repository_name
 
 def fetch_cisa_vulnerabilities():
     try:
@@ -65,18 +65,18 @@ def update_github_readme(content):
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(REPO_NAME)
         print(f"Connected to repository: {repo.name}")
-        
-        # Try to fetch the README file to update it
+
         try:
             print("Attempting to fetch README.md from the repo...")
             readme = repo.get_contents("README.md")
             print(f"README.md found with sha: {readme.sha}")
+            
             # Attempt to update the README file
             repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
             print("README updated successfully.")
         except Exception as e:
+            print(f"Error fetching README.md: {e}")
             print("README.md not found, creating a new one...")
-            print(f"Error: {e}")
             # If README doesn't exist, create it
             repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
             print("README created successfully.")
