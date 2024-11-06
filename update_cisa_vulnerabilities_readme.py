@@ -32,21 +32,26 @@ def update_readme_content(vulnerabilities):
 def update_github_readme(content):
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
-    
-    # Debug: List repository contents to verify access
-    contents = repo.get_contents("")
-    print("Repository contents:")
-    for content_file in contents:
-        print(content_file.path)
 
+    # Debug: List all files in the repository to confirm correct path
     try:
-        readme = repo.get_contents("README.md")
-        repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
-    except Exception as e:
-        if '404' in str(e):
+        contents = repo.get_contents("")
+        print("Repository contents:")
+        for content_file in contents:
+            print(content_file.path)  # Print paths of all files in the root directory
+
+        # Try accessing the README file directly
+        try:
+            readme = repo.get_contents("README.md")
+            repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
+            print("README file updated successfully.")
+        except Exception as e:
+            print("README not found, attempting to create it.")
             repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
-        else:
-            raise e
+            print("README file created successfully.")
+    except Exception as e:
+        print(f"Error listing repository contents: {e}")
+        raise e
 
 def main():
     vulnerabilities = fetch_latest_vulnerabilities()
