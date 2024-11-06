@@ -33,24 +33,19 @@ def update_github_readme(content):
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
 
-    # Debug: List all files in the repository to confirm correct path
     try:
-        contents = repo.get_contents("")
-        print("Repository contents:")
-        for content_file in contents:
-            print(content_file.path)  # Print paths of all files in the root directory
-
-        # Try accessing the README file directly
+        # Check if README.md exists and get its current contents
         try:
-            readme = repo.get_contents("README.md")
+            readme = repo.get_contents("README.md")  # Check in the root directory
+            print("README file found, attempting to update.")
             repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
             print("README file updated successfully.")
-        except Exception as e:
-            print("README not found, attempting to create it.")
+        except github.GithubException.UnknownObjectException:
+            print("README.md not found, creating a new one.")
             repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
             print("README file created successfully.")
     except Exception as e:
-        print(f"Error listing repository contents: {e}")
+        print(f"Error updating or creating README file: {e}")
         raise e
 
 def main():
