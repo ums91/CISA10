@@ -3,6 +3,7 @@ name: Update CISA Vulnerabilities README
 on:
   schedule:
     - cron: '0 0 * * *'  # Run every day at midnight (adjust as needed)
+  workflow_dispatch:  # Add a manual run button
 
 jobs:
   update-readme:
