@@ -46,17 +46,31 @@ def format_vulnerabilities_for_readme(vulnerabilities):
     # Format the latest vulnerabilities (first 10 from the filtered list)
     for vuln in vulnerabilities[:10]:
         cve_id = vuln.get('cveID', 'N/A')
-        description = vuln.get('shortDescription', 'No description available')
-        published_date = vuln.get('dateAdded', 'Unknown')
+        vendor_project = vuln.get('vendorProject', 'Unknown')
+        product = vuln.get('product', 'Unknown')
+        vulnerability_name = vuln.get('vulnerabilityName', 'Unknown')
+        date_added = vuln.get('dateAdded', 'Unknown')
+        short_description = vuln.get('shortDescription', 'No description available')
+        required_action = vuln.get('requiredAction', 'No action provided')
+        due_date = vuln.get('dueDate', 'Unknown')
+        ransomware_use = vuln.get('knownRansomwareCampaignUse', 'Unknown')
+        notes = vuln.get('notes', 'No notes provided')
         severity = vuln.get('severity', 'Unknown')  # Extract severity
-        
+
         # Debug: Print formatted content for each vulnerability
-        print(f"Formatting CVE: {cve_id}, Description: {description}, Date: {published_date}, Severity: {severity}")
+        print(f"Formatting CVE: {cve_id}, Description: {short_description}, Date: {date_added}, Severity: {severity}")
         
         readme_content += f"### {cve_id}\n"
-        readme_content += f"**Description**: {description}\n"
-        readme_content += f"**Published Date**: {published_date}\n"
-        readme_content += f"**Severity**: {severity}\n\n"  # Add severity to the README
+        readme_content += f"**Vendor Project**: {vendor_project}\n"
+        readme_content += f"**Product**: {product}\n"
+        readme_content += f"**Vulnerability Name**: {vulnerability_name}\n"
+        readme_content += f"**Published Date**: {date_added}\n"
+        readme_content += f"**Description**: {short_description}\n"
+        readme_content += f"**Required Action**: {required_action}\n"
+        readme_content += f"**Due Date**: {due_date}\n"
+        readme_content += f"**Severity**: {severity}\n"
+        readme_content += f"**Known Ransomware Campaign Use**: {ransomware_use}\n"
+        readme_content += f"**Notes**: {notes}\n\n"
 
     return readme_content
 
