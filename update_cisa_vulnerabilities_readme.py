@@ -3,8 +3,8 @@ from datetime import datetime
 from github import Github
 
 # Set up your GitHub token and repository details
-GITHUB_TOKEN = 'your_github_token'
-REPO_NAME = 'your_username/your_repository'  # e.g., 'ums91/Wolfpack'
+GITHUB_TOKEN = 'your_github_token'  # Will be set by GitHub Actions
+REPO_NAME = 'ums91/CISA10'
 
 # API endpoint for CISA KEV catalog
 CISA_API_URL = "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
