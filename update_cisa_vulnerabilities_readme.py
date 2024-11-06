@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 from github import Github
 
-# CISA vulnerabilities JSON URL (assuming JSON format)
+# CISA vulnerabilities JSON URL
 CISA_VULNERABILITIES_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
 DATE_THRESHOLD = datetime(2024, 10, 26)  # The date from which to fetch vulnerabilities
 
@@ -52,14 +52,20 @@ def update_github_readme(content):
         # Initialize the GitHub API client
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(REPO_NAME)
-        
+
         # Try to fetch the README file to update it
         try:
+            print("Attempting to fetch README.md from the repo...")
             readme = repo.get_contents("README.md")
+            print(f"README.md found with sha: {readme.sha}")
             repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
-        except Exception:
+            print("README updated successfully.")
+        except Exception as e:
+            print("README.md not found, creating a new one...")
+            print(f"Error: {e}")
             # If README doesn't exist, create it
             repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
+            print("README created successfully.")
 
     except Exception as e:
         print(f"Error updating or creating README file: {e}")
@@ -67,8 +73,11 @@ def update_github_readme(content):
 
 def main():
     vulnerabilities = fetch_cisa_vulnerabilities()
-    readme_content = format_vulnerabilities_for_readme(vulnerabilities)
-    update_github_readme(readme_content)
+    if vulnerabilities:
+        readme_content = format_vulnerabilities_for_readme(vulnerabilities)
+        update_github_readme(readme_content)
+    else:
+        print("No vulnerabilities found after the date threshold.")
 
 if __name__ == "__main__":
     main()
