@@ -48,13 +48,15 @@ def format_vulnerabilities_for_readme(vulnerabilities):
         cve_id = vuln.get('cveID', 'N/A')
         description = vuln.get('shortDescription', 'No description available')
         published_date = vuln.get('dateAdded', 'Unknown')
+        severity = vuln.get('severity', 'Unknown')  # Extract severity
         
         # Debug: Print formatted content for each vulnerability
-        print(f"Formatting CVE: {cve_id}, Description: {description}, Date: {published_date}")
+        print(f"Formatting CVE: {cve_id}, Description: {description}, Date: {published_date}, Severity: {severity}")
         
         readme_content += f"### {cve_id}\n"
         readme_content += f"**Description**: {description}\n"
-        readme_content += f"**Published Date**: {published_date}\n\n"
+        readme_content += f"**Published Date**: {published_date}\n"
+        readme_content += f"**Severity**: {severity}\n\n"  # Add severity to the README
 
     return readme_content
 
