@@ -16,15 +16,18 @@ def fetch_cisa_vulnerabilities():
     try:
         response = requests.get(CISA_VULNERABILITIES_URL)
         response.raise_for_status()  # Raises an HTTPError if the response was an error
-        vulnerabilities = response.json()  # Parse the JSON response
+        vulnerabilities_data = response.json()  # Parse the JSON response
 
         # Debugging: print the structure of the vulnerabilities object
-        print(json.dumps(vulnerabilities, indent=2))  # Pretty print the JSON response for inspection
+        print(json.dumps(vulnerabilities_data, indent=2))  # Pretty print the JSON response for inspection
         
-        # Filter vulnerabilities based on published date (only include those from 20-Oct-2024 onwards)
+        # Access the 'vulnerabilities' key to get the list of vulnerabilities
+        vulnerabilities = vulnerabilities_data.get("vulnerabilities", [])
+        
+        # Filter vulnerabilities based on published date (only include those from 1-Nov-2024 onwards)
         filtered_vulnerabilities = [
             vuln for vuln in vulnerabilities
-            if datetime.strptime(vuln.get('published_date', ''), '%Y-%m-%dT%H:%M:%S.%fZ') > DATE_THRESHOLD
+            if datetime.strptime(vuln.get('dateAdded', ''), '%Y-%m-%d') > DATE_THRESHOLD
         ]
 
         return filtered_vulnerabilities
@@ -38,9 +41,9 @@ def format_vulnerabilities_for_readme(vulnerabilities):
 
     # Format the latest vulnerabilities (first 10 from the filtered list)
     for vuln in vulnerabilities[:10]:
-        cve_id = vuln.get('cve', 'N/A')
-        description = vuln.get('description', 'No description available')
-        published_date = vuln.get('published_date', 'Unknown')
+        cve_id = vuln.get('cveID', 'N/A')
+        description = vuln.get('shortDescription', 'No description available')
+        published_date = vuln.get('dateAdded', 'Unknown')
         readme_content += f"### {cve_id}\n"
         readme_content += f"**Description**: {description}\n"
         readme_content += f"**Published Date**: {published_date}\n\n"
