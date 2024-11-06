@@ -24,12 +24,16 @@ def fetch_cisa_vulnerabilities():
         # Access the 'vulnerabilities' key to get the list of vulnerabilities
         vulnerabilities = vulnerabilities_data.get("vulnerabilities", [])
         
+        # Debugging: check the number of vulnerabilities fetched
+        print(f"Total vulnerabilities fetched: {len(vulnerabilities)}")
+
         # Filter vulnerabilities based on published date (only include those from 1-Nov-2024 onwards)
         filtered_vulnerabilities = [
             vuln for vuln in vulnerabilities
             if datetime.strptime(vuln.get('dateAdded', ''), '%Y-%m-%d') > DATE_THRESHOLD
         ]
 
+        print(f"Filtered vulnerabilities: {len(filtered_vulnerabilities)}")  # Debug the count of filtered vulnerabilities
         return filtered_vulnerabilities
 
     except requests.exceptions.RequestException as e:
@@ -44,6 +48,10 @@ def format_vulnerabilities_for_readme(vulnerabilities):
         cve_id = vuln.get('cveID', 'N/A')
         description = vuln.get('shortDescription', 'No description available')
         published_date = vuln.get('dateAdded', 'Unknown')
+        
+        # Debug: Print formatted content for each vulnerability
+        print(f"Formatting CVE: {cve_id}, Description: {description}, Date: {published_date}")
+        
         readme_content += f"### {cve_id}\n"
         readme_content += f"**Description**: {description}\n"
         readme_content += f"**Published Date**: {published_date}\n\n"
@@ -80,6 +88,7 @@ def main():
     vulnerabilities = fetch_cisa_vulnerabilities()
     if vulnerabilities:
         readme_content = format_vulnerabilities_for_readme(vulnerabilities)
+        print(f"Generated README content:\n{readme_content}")  # Debug the generated content
         update_github_readme(readme_content)
     else:
         print("No vulnerabilities found after the date threshold.")
