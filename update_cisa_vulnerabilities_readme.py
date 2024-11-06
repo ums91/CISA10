@@ -1,59 +1,76 @@
 import requests
-from github import Github, GithubException
+import github
+from github import Github
 import os
 from datetime import datetime
+import base64
+import json
 
-# GitHub authentication using the repository secret token
-token = os.getenv('CISA_10')  # Make sure you have the correct environment variable set
-g = Github(token)
+# GitHub repository settings
+REPO_NAME = "CISA10"
+OWNER_NAME = "ums91"
+GITHUB_TOKEN = os.getenv("CISA_10")  # GitHub token stored in your environment variables
 
-# CISA KEV feed URL
-CISA_FEED_URL = 'https://www.cisa.gov/sites/default/files/feeds/kev.csv'
+# URL for the CISA KEV JSON feed
+CISA_VULNERABILITIES_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
 
-# Function to fetch CISA vulnerabilities from the KEV feed
+# Fetch CISA vulnerabilities from the JSON feed
 def fetch_cisa_vulnerabilities():
-    response = requests.get(CISA_FEED_URL)
-    response.raise_for_status()  # Raises an HTTPError if the response was an error
-    vulnerabilities = response.text.splitlines()[1:]  # Skip the header row
-    return vulnerabilities
+    try:
+        response = requests.get(CISA_VULNERABILITIES_URL)
+        response.raise_for_status()  # Raises an HTTPError if the response was an error
+        vulnerabilities = response.json()  # Parse the JSON response
+        return vulnerabilities
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching CISA vulnerabilities: {e}")
+        raise
 
-# Function to format the vulnerability data as a Markdown table
-def format_vulnerabilities(vulnerabilities):
-    formatted_vulns = "| CVE ID | Description | Published Date |\n"
-    formatted_vulns += "|--------|-------------|----------------|\n"
-    for vuln in vulnerabilities[:10]:  # Get the top 10 vulnerabilities
-        cve_id, description, published_date = vuln.split(',')
-        formatted_vulns += f"| {cve_id} | {description} | {published_date} |\n"
-    return formatted_vulns
-
-# Function to update or create the README file in the GitHub repository
+# Update the README with the latest vulnerabilities
 def update_github_readme(content):
     try:
-        repo = g.get_repo("ums91/CISA10")  # Replace with your actual repository name
+        g = Github(GITHUB_TOKEN)
+        repo = g.get_repo(f"{OWNER_NAME}/{REPO_NAME}")
+        
+        # Check if README exists
         try:
-            # Try to get the README file
             readme = repo.get_contents("README.md")
             print("README file found, attempting to update.")
-            # Update the README with the new content
             repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
-        except GithubException as e:
-            # If the README file does not exist, create it
+        except github.GithubException.UnknownObjectException:
             print("README file not found, attempting to create it.")
             repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
-    except GithubException as e:
+    except Exception as e:
         print(f"Error updating or creating README file: {e}")
+        raise
 
-# Main function to run the process
+# Format the vulnerabilities for the README
+def format_vulnerabilities_for_readme(vulnerabilities):
+    today = datetime.today().strftime("%Y-%m-%d")
+    readme_content = f"# CISA Vulnerabilities - {today}\n\n"
+    readme_content += "## Latest CISA Known Exploited Vulnerabilities\n\n"
+    
+    # Get the first 10 vulnerabilities
+    for vuln in vulnerabilities[:10]:
+        id = vuln.get("cisaID", "N/A")
+        title = vuln.get("title", "No Title")
+        description = vuln.get("description", "No Description")
+        date_added = vuln.get("dateAdded", "N/A")
+        
+        readme_content += f"### {id} - {title}\n"
+        readme_content += f"**Description:** {description}\n"
+        readme_content += f"**Date Added:** {date_added}\n\n"
+    
+    return readme_content
+
+# Main function
 def main():
-    # Fetch the latest CISA vulnerabilities
+    # Fetch the latest vulnerabilities
     vulnerabilities = fetch_cisa_vulnerabilities()
-
-    # Format the vulnerabilities as a Markdown table
-    readme_content = f"# Latest CISA Vulnerabilities ({datetime.now().strftime('%Y-%m-%d')})\n\n"
-    readme_content += "## Top 10 CISA Vulnerabilities\n\n"
-    readme_content += format_vulnerabilities(vulnerabilities)
-
-    # Update the README file on GitHub
+    
+    # Format the content for the README
+    readme_content = format_vulnerabilities_for_readme(vulnerabilities)
+    
+    # Update the README with the new content
     update_github_readme(readme_content)
 
 # Run the script
