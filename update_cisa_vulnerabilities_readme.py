@@ -6,7 +6,7 @@ from github import Github
 
 # CISA vulnerabilities JSON URL
 CISA_VULNERABILITIES_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
-DATE_THRESHOLD = datetime(2024, 11, 01)  # The date from which to fetch vulnerabilities
+DATE_THRESHOLD = datetime(2024, 11, 1)  # The date from which to fetch vulnerabilities
 
 # Fetch the GitHub token from GitHub Secrets
 GITHUB_TOKEN = os.getenv("CISA_10")
