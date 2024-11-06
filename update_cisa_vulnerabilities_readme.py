@@ -71,6 +71,7 @@ def update_github_readme(content):
             print("Attempting to fetch README.md from the repo...")
             readme = repo.get_contents("README.md")
             print(f"README.md found with sha: {readme.sha}")
+            # Attempt to update the README file
             repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
             print("README updated successfully.")
         except Exception as e:
