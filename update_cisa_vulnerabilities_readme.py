@@ -2,6 +2,7 @@ import os
 import requests
 from datetime import datetime, timezone
 from github import Github
+import github
 
 GITHUB_TOKEN = os.getenv("CISA_10")  # GitHub Actions token
 REPO_NAME = 'ums91/CISA10'
