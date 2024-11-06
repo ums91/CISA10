@@ -1,6 +1,6 @@
 import os
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from github import Github
 
 # Set up your GitHub token and repository details
@@ -29,7 +29,7 @@ def fetch_latest_vulnerabilities():
 # Update README content with the latest vulnerabilities
 def update_readme_content(vulnerabilities):
     readme_content = "# Known Exploited Vulnerabilities\n\n"
-    readme_content += f"Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
+    readme_content += f"Last updated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
     
     for vulnerability in vulnerabilities:
         readme_content += f"## {vulnerability.get('cveID', 'N/A')}\n"
@@ -45,8 +45,17 @@ def update_readme_content(vulnerabilities):
 def update_github_readme(content):
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
-    readme = repo.get_contents("README.md")
-    repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
+    try:
+        # Attempt to get README file contents
+        readme = repo.get_contents("README.md")
+        # If README exists, update it
+        repo.update_file(readme.path, "Update README with latest CISA vulnerabilities", content, readme.sha)
+    except Exception as e:
+        # If README does not exist (404 error), create it
+        if '404' in str(e):
+            repo.create_file("README.md", "Create README with latest CISA vulnerabilities", content)
+        else:
+            raise e  # Re-raise other exceptions
 
 # Main function to update the README
 def main():
