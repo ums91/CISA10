@@ -7,22 +7,24 @@ from github import Github
 GITHUB_TOKEN = os.getenv("CISA_10")  # Will be set by GitHub Actions
 REPO_NAME = 'ums91/CISA10'
 
-# API endpoint for CISA KEV catalog
-CISA_API_URL = "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+# Direct JSON endpoint for CISA KEV catalog
+CISA_JSON_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
 
 # Fetch the latest vulnerabilities from CISA with error handling
 def fetch_latest_vulnerabilities():
-    response = requests.get(CISA_API_URL)
+    response = requests.get(CISA_JSON_URL)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch data from CISA. Status code: {response.status_code}")
+    
     try:
-        vulnerabilities = response.json()  # Assumes JSON response format
+        data = response.json()  # Parse JSON response directly
     except requests.exceptions.JSONDecodeError as e:
         raise Exception(f"JSON decode error: {e}. Response content: {response.text}")
     
-    # Sort vulnerabilities by date added in descending order
+    # Extract vulnerabilities and sort by date added in descending order
+    vulnerabilities = data.get("vulnerabilities", [])
     vulnerabilities.sort(key=lambda x: x.get('dateAdded', ''), reverse=True)
-    return vulnerabilities[:10]
+    return vulnerabilities[:10]  # Return the latest 10 vulnerabilities
 
 # Update README content with the latest vulnerabilities
 def update_readme_content(vulnerabilities):
