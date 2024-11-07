@@ -2,7 +2,7 @@ name: Update CISA Vulnerabilities README
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run every day at midnight (adjust as needed)
+    - cron: '30 20 * * *'  # Run every day at 1:30 am (adjust as needed)
   workflow_dispatch:  # Add a manual run button
 
 jobs:
